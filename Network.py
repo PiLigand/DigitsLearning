@@ -17,3 +17,12 @@ class Network(object):
         #Two dimmensions to three. Each hidden/output neuron gets weights from each prev generation neuron.
         #Cycles through sizes using sizes[R] for rows and sizes[R-1=C] for columns, thus the offset.
         self.weights = [np.random.radn(y, x) for x, y in zip(sizes[:-1], sizes[1:])]
+
+
+
+# Supporting functions
+def sigmoid(x): #The sigmoid function
+    return (1/(1+np.exp(-x)))
+
+def sigmoidPrime(x): #Derivative of the sigmoid function
+    return sigmoid(x)*(1-sigmoid(x))

@@ -45,7 +45,7 @@ class Network(object):
         # this syntax wouldn't work with most lists, but these were defined as numpy arrays when they were first made
         nabla_b = [np.zeros(b.shape) for b in self.biases]
         nabla_w = [np.zeros(w.shape) for w in self.weights]
-        for x, y in mini_batch: # x is the input image and y is the label?
+        for x, y in mini_batch: # x is the input image and y is the label.
             delta_nabla_b, delta_nabla_w = self.backprop(x, y)
             nabla_b = [nb+dnb for nb, dnb in zip(nabla_b, delta_nabla_b)]
             nabla_w = [nw+dnw for nw, dnw in zip(nabla_w, delta_nabla_w)]

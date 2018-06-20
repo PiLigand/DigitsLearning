@@ -18,7 +18,4 @@ metar = [alph,sizes,chrl]
 for a, b in zip(sizes, bet):
     print (a*b) """
 
-rands = numpy.random.randn(3,4)
-
-print (rands.shape)
-print (rands[2,2])
+print (alph[0])

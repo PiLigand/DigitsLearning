@@ -43,16 +43,37 @@ class Network(object):
 
     def update_mini_batch(self, mini_batch, eta):
         # this syntax wouldn't work with most lists, but these were defined as numpy arrays when they were first made
+        # Also, Cost is a function of weights and biases, but here they are simply separated into their own vectors
+            # for ease of application. The spearation has no mathematical signifigance. 
         nabla_b = [np.zeros(b.shape) for b in self.biases]
         nabla_w = [np.zeros(w.shape) for w in self.weights]
-        for x, y in mini_batch: # x is the input image and y is the label.
-            delta_nabla_b, delta_nabla_w = self.backprop(x, y)
+        for x, y in mini_batch: # x is the input image and y is the label - the right answer.
+            delta_nabla_b, delta_nabla_w = self.backprop(x, y) # Figures out how much to change each variable.
             nabla_b = [nb+dnb for nb, dnb in zip(nabla_b, delta_nabla_b)]
             nabla_w = [nw+dnw for nw, dnw in zip(nabla_w, delta_nabla_w)]
-        self.weights
+        self.weights = [w - (eta/len(mini_batch))*nw for w, nw in zip(self.weights, nabla_w)] """ Why are we dividing by the length of mini batch? """
+        self.biases = [b - (eta/len(mini_batch))*nb fir b, nb in zip(self.biases, nabla_b)]
 
     def backprop(self, x, y):
+        nabla_b = [np.zeros(b.shape) for b in self.biases]
+        nabla_w = [np.zeroes(w.shape) for w in self.weights]
+        # Feed Forward Section calculating z, then sigmoid to get each layer of activation
+        activation = x # Activation of first layer
+        activations = [x] # List to store layer of activations. Will add layers as we go.
+        zs = [] # List to store z vectors (what will be sigmoided) Will add layers as we go
+        for b, w in zip(self.biases, self.weights): #Goes through layer by layer, calculating activations of layers from previous layers
+            z = np.dot(w, activation) + b
+            zs.append(z)
+            activation = sigmoid(z)
+        # Back Propogation section
+        # activations[-1] is the output layer, y is a number label
+        delta = self.cost_derivative(activation[-1], y) * sigmoidPrime(zs[-1]) # A piece of an equation that we need twice. In d/dw, d/da and d/db
 
+
+
+    def cost_derivative(self, output_activations, y): # y is a number label
+        # Pretty sure y is a list representing ideal network output, not an integer
+        return (output_activations - y) # d[(a-y)^2] proportional to. Can ignor the resulting 2 factor. ultimately eta controlled.
 
 
 

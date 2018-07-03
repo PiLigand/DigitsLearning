@@ -44,7 +44,7 @@ class Network(object):
     def update_mini_batch(self, mini_batch, eta):
         # this syntax wouldn't work with most lists, but these were defined as numpy arrays when they were first made
         # Also, Cost is a function of weights and biases, but here they are simply separated into their own vectors
-            # for ease of application. The spearation has no mathematical signifigance. 
+            # for ease of application. The spearation has no mathematical signifigance.
         nabla_b = [np.zeros(b.shape) for b in self.biases]
         nabla_w = [np.zeros(w.shape) for w in self.weights]
         for x, y in mini_batch: # x is the input image and y is the label - the right answer.
@@ -52,7 +52,7 @@ class Network(object):
             nabla_b = [nb+dnb for nb, dnb in zip(nabla_b, delta_nabla_b)]
             nabla_w = [nw+dnw for nw, dnw in zip(nabla_w, delta_nabla_w)]
         self.weights = [w - (eta/len(mini_batch))*nw for w, nw in zip(self.weights, nabla_w)] """ Why are we dividing by the length of mini batch? """
-        self.biases = [b - (eta/len(mini_batch))*nb fir b, nb in zip(self.biases, nabla_b)]
+        self.biases = [b - (eta/len(mini_batch))*nb fir b, nb in zip(self.biases, nabla_b)] # Is this where the averaging is done? We'll see
 
     def backprop(self, x, y):
         nabla_b = [np.zeros(b.shape) for b in self.biases]
@@ -61,19 +61,31 @@ class Network(object):
         activation = x # Activation of first layer
         activations = [x] # List to store layer of activations. Will add layers as we go.
         zs = [] # List to store z vectors (what will be sigmoided) Will add layers as we go
-        for b, w in zip(self.biases, self.weights): #Goes through layer by layer, calculating activations of layers from previous layers
+        for b, w in zip(self.biases, self.weights): # Goes through layer by layer, calculating activations of layers from previous layers
             z = np.dot(w, activation) + b
             zs.append(z)
             activation = sigmoid(z)
         # Back Propogation section
-        # activations[-1] is the output layer, y is a number label
+        # activations[-1] is the output layer, y is a number label. array[-1] gives the last element in that array.
         delta = self.cost_derivative(activation[-1], y) * sigmoidPrime(zs[-1]) # A piece of an equation that we need twice. In d/dw, d/da and d/db
+        nabla_b[-1] = delta # No further components
+        nabla_w[-1] = np.dot(delta, activations[-2].transpose()) # nx1 nx1T ->  nx1 1xn = nxn matrix
 
+        for l in range(-2, -self.num_layers, -1): """Changed to step l backwards. May not work."""
+            z = zs[l] 
+            sp = sigmoidPrime(z)
+            delta = np.dot(self.weights[l+1].transpose(), delta) * sp
+            nabla_b[l] = delta
+            nabla_w[l] = np.dot(delta, activations[l-1].transpose())
+        return (nabla_b, nabla_w)
 
+    def evaluate(self, test_data):
+        test_results = [(np.argmax(self.feedforward(x)), y) for (x, y) in test_data]
+        return sum(int(x == y) for (x,y) in test_results)
 
     def cost_derivative(self, output_activations, y): # y is a number label
-        # Pretty sure y is a list representing ideal network output, not an integer
-        return (output_activations - y) # d[(a-y)^2] proportional to. Can ignor the resulting 2 factor. ultimately eta controlled.
+        # y is a list representing ideal network output, not an integer. Setup in the data mover/wrapper, not in MNIST
+        return (output_activations - y) # d[(a-y)^2] proportional to. Can ignore the resulting 2 factor. ultimately eta controlled.
 
 
 

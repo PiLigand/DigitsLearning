@@ -5,7 +5,7 @@
 import random
 
 #Third-Party Library.
-import numpy as np
+import numpy as np """Pretty sure this is going to cause a problem. 'No Module' """
 
 class Network(object):
 
@@ -72,7 +72,7 @@ class Network(object):
         nabla_w[-1] = np.dot(delta, activations[-2].transpose()) # nx1 nx1T ->  nx1 1xn = nxn matrix
 
         for l in range(-2, -self.num_layers, -1): """Changed to step l backwards. May not work."""
-            z = zs[l] 
+            z = zs[l]
             sp = sigmoidPrime(z)
             delta = np.dot(self.weights[l+1].transpose(), delta) * sp
             nabla_b[l] = delta

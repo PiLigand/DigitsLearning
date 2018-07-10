@@ -8,9 +8,10 @@ class DataSet(object):
 
         _magicNumbers()
 
-        if (_checkEntries()):
+        if (_checkEntries()): # Should form list of images and corresponding list of labels
             _pickImages()
             _pickLabels()
+            _wrapLabels()
         else:
             print("Image/label count mismatch.")
 
@@ -41,11 +42,40 @@ class DataSet(object):
         self.imgCols = struct.unpack(">i", self.imagesFile.read(4))[0]
 
         #Initialize empty list. Each item will have a two dimmensional list within
-        self.ImagesList = []
+        self.imagesList = []
 
         #For loop to cycle through each item / each image
         for i in range(0, self.imgCt):
-            self.ImagesList.append([])
-            #For loop for first dimmensions (to 28)
-                Append
-                #For loop for second dimmensions (to 28)
+            self.imagesList.append([])
+            #For loop for first dimmensions (Rows to 28)
+            for j in range(0, self.imgRows):
+                self.imagesList[i].append([])
+                #For loop for second dimmensions (Columns to 28)
+                for k in range(0, self.imgCols):
+                    point = struct.unpack(">f", self.imagesFile.read(1))[0]
+                    self.imagesList[i][j].append(point)
+
+    def _pickLabels(self): #Makes a list of all labels in order
+        self.labelsList = []
+
+        for i in range(0, self.lblCt):
+            self.labelsList.append(struct.unpack(">i", self.labelsFile.read(1))[0])
+
+    def _wrapLabels(self): # Creates a new list - one for each label - of ten-item lists
+    # Each label returns a list of zeros except for the position i which will hold 1.0
+        self.wrapLabels = []
+        for i in range(0, self.lblCt):
+                                    #0    1    2    3    4    5    6    7    8    9 
+            self.wrapLabels.append([0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+            self.wrapLabels[i][self.labelsList[i]] = 1.0
+
+    def images(self):
+        return self.imagesList
+
+    def labels(self):
+        return self.labelsList
+
+    def wrappedLabels(self):
+        return self.wrapLabels
+
+    def NielsenTuple(self): # Included specifically to return data in the format Nielsen uses

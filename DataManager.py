@@ -1,4 +1,5 @@
 import struct
+import numpy
 
 class DataSet(object):
 
@@ -56,16 +57,14 @@ class DataSet(object):
                     self.imagesList[i][j].append(point)
 
     def _pickLabels(self): #Makes a list of all labels in order
-        self.labelsList = []
-
-        for i in range(0, self.lblCt):
-            self.labelsList.append(struct.unpack(">i", self.labelsFile.read(1))[0])
+        self.labelsList = numpy.zeros(self.lblCt, numpy.int8) #Initializes a numpy array of correct size
+        self.labelsList = [struct.unpack(">i", self.labelsFile.read(1))[0] for i in self.labelsList] #Sets all values of labels from file
 
     def _wrapLabels(self): # Creates a new list - one for each label - of ten-item lists
     # Each label returns a list of zeros except for the position i which will hold 1.0
         self.wrapLabels = []
         for i in range(0, self.lblCt):
-                                    #0    1    2    3    4    5    6    7    8    9 
+                                    #0    1    2    3    4    5    6    7    8    9
             self.wrapLabels.append([0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
             self.wrapLabels[i][self.labelsList[i]] = 1.0
 

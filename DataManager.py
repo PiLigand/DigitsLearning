@@ -43,18 +43,15 @@ class DataSet(object):
         self.imgCols = struct.unpack(">i", self.imagesFile.read(4))[0]
 
         #Initialize empty list. Each item will have a two dimmensional list within
-        self.imagesList = []
+        self.imagesList = numpy.zeros((self.imgCt, self.imgRows, self.imgCols))
 
         #For loop to cycle through each item / each image
         for i in range(0, self.imgCt):
-            self.imagesList.append([])
             #For loop for first dimmensions (Rows to 28)
             for j in range(0, self.imgRows):
-                self.imagesList[i].append([])
                 #For loop for second dimmensions (Columns to 28)
                 for k in range(0, self.imgCols):
-                    point = struct.unpack(">f", self.imagesFile.read(1))[0]
-                    self.imagesList[i][j].append(point)
+                    self.imagesList[i][j][k] = struct.unpack(">f", self.imagesFile.read(1))[0]
 
     def _pickLabels(self): #Makes a list of all labels in order
         self.labelsList = numpy.zeros(self.lblCt, numpy.int8) #Initializes a numpy array of correct size

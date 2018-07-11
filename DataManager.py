@@ -73,4 +73,15 @@ class DataSet(object):
     def wrappedLabels(self):
         return self.wrapLabels
 
-    def NielsenTuple(self): # Included specifically to return data in the format Nielsen uses
+    def NielsenTuple(self, train, val, test): # train val and test are ints that count the entries for training_data, valiation_data, and test_data. Probs 50k, 10k, 10k
+        # Included specifically to return data in the format Nielsen uses in his load_data_wrapper()
+        linearImages = [numpy.reshape(ar, (self.imgRows*self.imgCols)) for ar in self.imagesList]
+
+        training_data = [self.linearImages[x], self.wrapLabels[x] for x in range(0, train)] # Tuple of first [50k] linear image entries with their wrapped labels
+        test_data = [self.linearImages[x], self.imageLabels[x] for x in range(train, train+test)] #Tuple of next [10k] linear image entries with int labels
+
+        validation_data = [self.linearImages[x], self.imageLabels[x] for x in range(0, self.imgCt)] # Tuples all linear images with int labels
+        numpy.random.shuffle(validation_data)   # Shuffels said entries. Still tuple'd, but now in a randowm order
+        validation_data = validation_data[:val] # Trims to only first [10k or val] linear image entries requested for validation. With int labels
+
+        return training_data, validation_data, test_data

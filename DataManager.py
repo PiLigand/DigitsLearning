@@ -62,7 +62,7 @@ class DataSet(object):
     def _wrapLabels(self): # Creates a new list - one for each label - of ten-item lists
     # Each label returns a list of zeros except for the position i which will hold 1.0
         print("Wrapping labels picked from file.")
-        self.wrapLabels = numpy.zeros((self.lblCt, 10))
+        self.wrapLabels = numpy.zeros((self.lblCt, 10, 1))
         #Changes appropriate number in each label to 1.0
         for i in range(0, self.lblCt):
             self.wrapLabels[i][self.labelsList[i]] = 1.0
@@ -79,7 +79,7 @@ class DataSet(object):
     def NielsenTuple(self, train, val, test): # train val and test are ints that count the entries for training_data, valiation_data, and test_data. Probs 50k, 10k, 10k
         # Included specifically to return data in the format Nielsen uses in his load_data_wrapper()
         print("Formatting data for Nielsen Tuple")
-        linearImages = [numpy.reshape(ar, (self.imgRows*self.imgCols)) for ar in self.imagesList]
+        linearImages = [numpy.reshape(ar, (self.imgRows*self.imgCols, 1)) for ar in self.imagesList]
 
         training_data = [(linearImages[x], self.wrapLabels[x]) for x in range(0, train)] # Tuple of first [50k] linear image entries with their wrapped labels
         test_data = [(linearImages[x], self.labelsList[x]) for x in range(train, train+test)] #Tuple of next [10k] linear image entries with int labels

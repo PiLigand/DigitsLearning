@@ -1,3 +1,6 @@
+import Network
 import DataManager
 
-testSet = DataManager.DataSet()
+import Numpy
+
+MNIST = DataManager.DataSet()

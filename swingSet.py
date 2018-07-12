@@ -1,14 +1,12 @@
-#Little file to play with creating and structuring classes
+import struct
 
-class swing(object):
-    def __init__(self, a=2, b=3):
-        self.c=newFunction(a,b)
+imagesPath = "train-images-idx3-ubyte"
+imagesFile = open(imagesPath, "rb")
 
-    def getC(self):
-        return self.c
+print("Magic Number: %i" % struct.unpack(">i", imagesFile.read(4))[0])
 
-# Normally functions need to be above their uses, but sinc this is all imported,
-# this is technically compiled prior to being run?
-# Functions used by classes can be below thier class.
-def newFunction(a, b):
-    return ((a+b)*a)
+print("Number Entries: %i" % struct.unpack(">i", imagesFile.read(4))[0])
+
+print("Images Rows: %i" % struct.unpack(">I", imagesFile.read(1))[0])
+
+print("Images Cols: %i" % struct.unpack(">I", imagesFile.read(1))[0])

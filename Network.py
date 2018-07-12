@@ -62,9 +62,11 @@ class Network(object):
         activations = [x] # List to store layer of activations. Will add layers as we go.
         zs = [] # List to store z vectors (what will be sigmoided) Will add layers as we go
         for b, w in zip(self.biases, self.weights): # Goes through layer by layer, calculating activations of layers from previous layers
-            z = np.dot(w, activation) + b
+            z = np.dot(w, activation)+b
             zs.append(z)
             activation = sigmoid(z)
+            activations.append(activation)
+
         # Back Propogation section
         # activations[-1] is the output layer, y is a number label. array[-1] gives the last element in that array.
         delta = self.cost_derivative(activations[-1], y) * sigmoidPrime(zs[-1]) # A piece of an equation that we need twice. In d/dw, d/da and d/db

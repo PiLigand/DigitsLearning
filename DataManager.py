@@ -7,12 +7,12 @@ class DataSet(object):
         self.imagesFile = open(imagesPath, "rb")
         self.labelsFile = open(labelsPath, "rb")
 
-        _magicNumbers()
+        self._magicNumbers()
 
-        if (_checkEntries()): # Should form list of images and corresponding list of labels
-            _pickImages()
-            _pickLabels()
-            _wrapLabels()
+        if (self._checkEntries()): # Should form list of images and corresponding list of labels
+            self._pickImages()
+            self._pickLabels()
+            self._wrapLabels()
         else:
             print("Image/label count mismatch.")
 
@@ -25,17 +25,17 @@ class DataSet(object):
         self.imgMN = struct.unpack(">i", self.imagesFile.read(4))[0]
         self.lblMN = struct.unpack(">i", self.labelsFile.read(4))[0]
         #Comment these lines to neglect output
-        print ("Images Magic Number: " + self.imgMN)
-        print ("Labels Magic Number: " + self.lblMN)
+        print ("Images Magic Number: %i" % self.imgMN)
+        print ("Labels Magic Number: %i" % self.lblMN)
 
     def _checkEntries(self): # Returns a quick boolean check to make sure there are the correct number of entries for each list.
         self.imgCt = struct.unpack(">i", self.imagesFile.read(4))[0]
         self.lblCt = struct.unpack(">i", self.labelsFile.read(4))[0]
         #Can comment these to neglect the output.
-        print ("Images Count: " + self.imgCt)
-        print ("Labels Count: " + self.lblCt)
+        print ("Images Count: %i" % self.imgCt)
+        print ("Labels Count: %i" % self.lblCt)
 
-        return (imgCt == lblCt)
+        return (self.imgCt == self.lblCt)
 
     def _pickImages(self):
         # For MNIST files as of 07/09/18, these values should each be 28 (integer)
@@ -51,11 +51,11 @@ class DataSet(object):
             for j in range(0, self.imgRows):
                 #For loop for second dimmensions (Columns to 28)
                 for k in range(0, self.imgCols):
-                    self.imagesList[i][j][k] = struct.unpack(">f", self.imagesFile.read(1))[0]
+                    self.imagesList[i][j][k] = byteToFloat(self.imagesFile.read(1)) # Fills with a pixel value from 0.0 to 1.0
 
     def _pickLabels(self): #Makes a list of all labels in order
         self.labelsList = numpy.zeros(self.lblCt, numpy.int8) #Initializes a numpy array of correct size
-        self.labelsList = [struct.unpack(">i", self.labelsFile.read(1))[0] for i in self.labelsList] #Sets all values of labels from file
+        self.labelsList = [struct.unpack(">I", self.labelsFile.read(1))[0] for i in self.labelsList] #Sets all values of labels from file
 
     def _wrapLabels(self): # Creates a new list - one for each label - of ten-item lists
     # Each label returns a list of zeros except for the position i which will hold 1.0
@@ -77,11 +77,14 @@ class DataSet(object):
         # Included specifically to return data in the format Nielsen uses in his load_data_wrapper()
         linearImages = [numpy.reshape(ar, (self.imgRows*self.imgCols)) for ar in self.imagesList]
 
-        training_data = [self.linearImages[x], self.wrapLabels[x] for x in range(0, train)] # Tuple of first [50k] linear image entries with their wrapped labels
-        test_data = [self.linearImages[x], self.imageLabels[x] for x in range(train, train+test)] #Tuple of next [10k] linear image entries with int labels
+        training_data = [(self.linearImages[x], self.wrapLabels[x]) for x in range(0, train)] # Tuple of first [50k] linear image entries with their wrapped labels
+        test_data = [(self.linearImages[x], self.imageLabels[x]) for x in range(train, train+test)] #Tuple of next [10k] linear image entries with int labels
 
-        validation_data = [self.linearImages[x], self.imageLabels[x] for x in range(0, self.imgCt)] # Tuples all linear images with int labels
+        validation_data = [(self.linearImages[x], self.imageLabels[x]) for x in range(0, self.imgCt)] # Tuples all linear images with int labels
         numpy.random.shuffle(validation_data)   # Shuffels said entries. Still tuple'd, but now in a randowm order
         validation_data = validation_data[:val] # Trims to only first [10k or val] linear image entries requested for validation. With int labels
 
         return training_data, validation_data, test_data
+
+def byteToFloat(read): # Converts an incoming unsigned byte to an integer (0-255) and then scales that to a float from 0.0 to 1.0
+    return float(struct.unpack(">I", read)[0])/255.0

@@ -38,6 +38,7 @@ class DataSet(object):
         return (self.imgCt == self.lblCt)
 
     def _pickImages(self):
+        print("Picking images from file.")
         # For MNIST files as of 07/09/18, these values should each be 28 (integer)
         self.imgRows = struct.unpack(">i", self.imagesFile.read(4))[0]
         self.imgCols = struct.unpack(">i", self.imagesFile.read(4))[0]
@@ -54,11 +55,13 @@ class DataSet(object):
                     self.imagesList[i][j][k] = byteToFloat(self.imagesFile.read(1)) # Fills with a pixel value from 0.0 to 1.0
 
     def _pickLabels(self): #Makes a list of all labels in order
+        print("Picking labels from file.")
         self.labelsList = numpy.zeros(self.lblCt, numpy.int8) #Initializes a numpy array of correct size
-        self.labelsList = [struct.unpack(">I", self.labelsFile.read(1))[0] for i in self.labelsList] #Sets all values of labels from file
+        self.labelsList = [struct.unpack(">B", self.labelsFile.read(1))[0] for i in self.labelsList] #Sets all values of labels from file
 
     def _wrapLabels(self): # Creates a new list - one for each label - of ten-item lists
     # Each label returns a list of zeros except for the position i which will hold 1.0
+        print("Wrapping labels picked from file.")
         self.wrapLabels = numpy.zeros((self.lblCt, 10))
         #Changes appropriate number in each label to 1.0
         for i in range(0, self.lblCt):
@@ -75,16 +78,17 @@ class DataSet(object):
 
     def NielsenTuple(self, train, val, test): # train val and test are ints that count the entries for training_data, valiation_data, and test_data. Probs 50k, 10k, 10k
         # Included specifically to return data in the format Nielsen uses in his load_data_wrapper()
+        print("Formatting data for Nielsen Tuple")
         linearImages = [numpy.reshape(ar, (self.imgRows*self.imgCols)) for ar in self.imagesList]
 
-        training_data = [(self.linearImages[x], self.wrapLabels[x]) for x in range(0, train)] # Tuple of first [50k] linear image entries with their wrapped labels
-        test_data = [(self.linearImages[x], self.imageLabels[x]) for x in range(train, train+test)] #Tuple of next [10k] linear image entries with int labels
+        training_data = [(linearImages[x], self.wrapLabels[x]) for x in range(0, train)] # Tuple of first [50k] linear image entries with their wrapped labels
+        test_data = [(linearImages[x], self.labelsList[x]) for x in range(train, train+test)] #Tuple of next [10k] linear image entries with int labels
 
-        validation_data = [(self.linearImages[x], self.imageLabels[x]) for x in range(0, self.imgCt)] # Tuples all linear images with int labels
+        validation_data = [(linearImages[x], self.labelsList[x]) for x in range(0, self.imgCt)] # Tuples all linear images with int labels
         numpy.random.shuffle(validation_data)   # Shuffels said entries. Still tuple'd, but now in a randowm order
         validation_data = validation_data[:val] # Trims to only first [10k or val] linear image entries requested for validation. With int labels
 
         return training_data, validation_data, test_data
 
 def byteToFloat(read): # Converts an incoming unsigned byte to an integer (0-255) and then scales that to a float from 0.0 to 1.0
-    return float(struct.unpack(">I", read)[0])/255.0
+    return float(struct.unpack(">B", read)[0])/255.0

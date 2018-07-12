@@ -56,7 +56,7 @@ class Network(object):
 
     def backprop(self, x, y):
         nabla_b = [np.zeros(b.shape) for b in self.biases]
-        nabla_w = [np.zeroes(w.shape) for w in self.weights]
+        nabla_w = [np.zeros(w.shape) for w in self.weights]
         # Feed Forward Section calculating z, then sigmoid to get each layer of activation
         activation = x # Activation of first layer
         activations = [x] # List to store layer of activations. Will add layers as we go.
@@ -67,7 +67,7 @@ class Network(object):
             activation = sigmoid(z)
         # Back Propogation section
         # activations[-1] is the output layer, y is a number label. array[-1] gives the last element in that array.
-        delta = self.cost_derivative(activation[-1], y) * sigmoidPrime(zs[-1]) # A piece of an equation that we need twice. In d/dw, d/da and d/db
+        delta = self.cost_derivative(activations[-1], y) * sigmoidPrime(zs[-1]) # A piece of an equation that we need twice. In d/dw, d/da and d/db
         nabla_b[-1] = delta # No further components
         nabla_w[-1] = np.dot(delta, activations[-2].transpose()) # nx1 nx1T ->  nx1 1xn = nxn matrix
 

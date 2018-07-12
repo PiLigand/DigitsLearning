@@ -5,7 +5,7 @@
 import random
 
 #Third-Party Library.
-import numpy as np """Pretty sure this is going to cause a problem. 'No Module' """
+import numpy as np
 
 class Network(object):
 
@@ -38,7 +38,7 @@ class Network(object):
 
             if test_data: # Done to report progress on testing data set if present
                 print ("Epoch {0}: {1}/{2}".format(j, self.evaluate(test_data), n_test)) # Call to evaluate function (defined below)
-            else
+            else:
                 print ("Epoch {0} complete!".format(j))
 
     def update_mini_batch(self, mini_batch, eta):
@@ -51,8 +51,8 @@ class Network(object):
             delta_nabla_b, delta_nabla_w = self.backprop(x, y) # Figures out how much to change each variable.
             nabla_b = [nb+dnb for nb, dnb in zip(nabla_b, delta_nabla_b)]
             nabla_w = [nw+dnw for nw, dnw in zip(nabla_w, delta_nabla_w)]
-        self.weights = [w - (eta/len(mini_batch))*nw for w, nw in zip(self.weights, nabla_w)] """ Why are we dividing by the length of mini batch? """
-        self.biases = [b - (eta/len(mini_batch))*nb fir b, nb in zip(self.biases, nabla_b)] # Is this where the averaging is done? We'll see
+        self.weights = [w - (eta/len(mini_batch))*nw for w, nw in zip(self.weights, nabla_w)]
+        self.biases = [b - (eta/len(mini_batch))*nb for b, nb in zip(self.biases, nabla_b)] # Is this where the averaging is done? We'll see
 
     def backprop(self, x, y):
         nabla_b = [np.zeros(b.shape) for b in self.biases]
@@ -71,7 +71,7 @@ class Network(object):
         nabla_b[-1] = delta # No further components
         nabla_w[-1] = np.dot(delta, activations[-2].transpose()) # nx1 nx1T ->  nx1 1xn = nxn matrix
 
-        for l in range(-2, -self.num_layers, -1): """Changed to step l backwards. May not work."""
+        for l in range(-2, -self.num_layers, -1):
             z = zs[l]
             sp = sigmoidPrime(z)
             delta = np.dot(self.weights[l+1].transpose(), delta) * sp

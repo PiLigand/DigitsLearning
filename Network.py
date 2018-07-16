@@ -99,3 +99,15 @@ def sigmoid(x): #The sigmoid function
 
 def sigmoidPrime(x): #Derivative of the sigmoid function
     return sigmoid(x)*(1-sigmoid(x))
+
+def relu(x): # The Rectified Linear Unit (ReLU) function. To replace sigmoid
+    if (x <= 0):
+        return 0
+    else:
+        return x
+
+def reluPrime(x): #Derivative of the relu function
+    if (x <= 0):
+        return 0
+    else:
+        return 1
